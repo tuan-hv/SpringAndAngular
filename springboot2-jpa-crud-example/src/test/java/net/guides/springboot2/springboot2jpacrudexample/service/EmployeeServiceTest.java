@@ -127,7 +127,7 @@ public class EmployeeServiceTest {
         when(employeeRepository.save(any(Employee.class))).thenThrow(Exception.class);
 
         EmployeeDTO createEmployee = employeeService.createEmployee(employee);
-        assertEquals(null, createEmployee);
+        assertEquals(new EmployeeDTO(), createEmployee);
     }
 
     @Test

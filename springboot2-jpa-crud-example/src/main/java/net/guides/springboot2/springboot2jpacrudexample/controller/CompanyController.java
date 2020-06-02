@@ -66,9 +66,7 @@ public class CompanyController {
             throw new FileDuplicateException("Company is already exist!");
         LOGGER.info("starting save company...");
         Optional<CompanyDTO> createCompany = companyService.createCompany(companyDTO);
-        if(createCompany.isPresent())
-            return ResponseEntity.ok().body(createCompany.get());
-        return ResponseEntity.badRequest().body(companyDTO);
+        return ResponseEntity.ok().body(createCompany.get());
     }
 
     @PutMapping("/companies/{id}")

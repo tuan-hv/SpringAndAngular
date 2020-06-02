@@ -22,7 +22,7 @@ public class CompanyService {
 
     public Optional<List<CompanyDTO>> findAllCompany() {
         List<Company> companies = companyRepository.findAll();
-        if (!companies.isEmpty()) {
+        if (companies != null) {
             LOGGER.info("get all company success!");
             List<CompanyDTO> companyDTOS = new ArrayList<>();
             companies.forEach(c ->
