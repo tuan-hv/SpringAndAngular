@@ -28,6 +28,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1")
 public class CompanyController {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CompanyController.class);
 
     @Autowired
@@ -79,7 +80,7 @@ public class CompanyController {
     public ResponseEntity<CompanyDTO> updateCompany(@PathVariable(value = "id") Long companyId,
                                                     @Valid @RequestBody CompanyDTO companyDTO) throws ResourceNotFoundException {
 
-        LOGGER.info("starting save company...");
+        LOGGER.info("starting update company...");
         CompanyDTO updateCompany = companyService.updateCompany(companyId, companyDTO)
                 .orElseThrow(() -> new ResourceNotFoundException(Constant.COMPANY_NOT_FOUNT + companyId));
         return ResponseEntity.ok(updateCompany);

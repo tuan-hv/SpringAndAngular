@@ -7,6 +7,8 @@ import net.guides.springboot2.springboot2jpacrudexample.exception.ResourceNotFou
 import net.guides.springboot2.springboot2jpacrudexample.repository.EmployeeRepository;
 import net.guides.springboot2.springboot2jpacrudexample.service.EmployeeService;
 import net.guides.springboot2.springboot2jpacrudexample.ultil.Constant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -22,6 +24,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 public class EmployeeController {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeController.class);
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
@@ -41,8 +45,10 @@ public class EmployeeController {
 	@Cacheable(value = "companies", key = "#companyId")
 	public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable(value = "id") Long employeeId)
 			throws ResourceNotFoundException {
+		LOGGER.info("Find by id employee :: ", employeeId);
 		EmployeeDTO employeeDTO = employeeService.getEmployeeById(employeeId)
 				.orElseThrow(() -> new ResourceNotFoundException(Constant.EMPLOYEE_NOT_FOUNT + employeeId));
+		LOGGER.info("Find by id employee success!");
 		return ResponseEntity.ok().body(employeeDTO);
 	}
 
@@ -50,6 +56,7 @@ public class EmployeeController {
 	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 	@CachePut(value= "company", key= "#companyDTO.id")
 	public EmployeeDTO createEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
+		LOGGER.info("starting save employee...");
 		return employeeService.createEmployee(employeeDTO);
 	}
 
@@ -58,6 +65,7 @@ public class EmployeeController {
 	@CachePut(value= "company", key= "#companyDTO.id")
 	public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable(value = "id") Long employeeId,
 			@Valid @RequestBody EmployeeDTO employeeDTO) throws ResourceNotFoundException {
+		LOGGER.info("starting update employee...");
 		EmployeeDTO updateEmployeeDTO = employeeService.updateEmployee(employeeId, employeeDTO)
 				.orElseThrow(() -> new ResourceNotFoundException(Constant.EMPLOYEE_NOT_FOUNT + employeeId));
 		return ResponseEntity.ok(updateEmployeeDTO);
@@ -68,10 +76,12 @@ public class EmployeeController {
 	@CacheEvict(value = "companies", allEntries=true)
 	public ResponseEntity<EmployeeDTO> deleteEmployee(@PathVariable(value = "id") Long employeeId)
 			throws ResourceNotFoundException {
+		LOGGER.info("start get employee by id!");
 		Employee deleteEmployee = employeeRepository.findById(employeeId)
 				.orElseThrow(() -> new ResourceNotFoundException(Constant.EMPLOYEE_NOT_FOUNT + employeeId));
 
 		employeeRepository.delete(deleteEmployee);
+		LOGGER.info("delete employee success!");
 		return ResponseEntity.ok(EmployeeCovert.convertEmployeeToEmployeeDTO(deleteEmployee));
 	}
 }
