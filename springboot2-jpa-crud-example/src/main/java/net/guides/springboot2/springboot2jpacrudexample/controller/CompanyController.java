@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -36,6 +37,7 @@ public class CompanyController {
     private CompanyService companyService;
 
     @GetMapping("/companies")
+    @PreAuthorize("permitAll()")
     @Cacheable(value = "companies", unless = "#result.body.body.size() == 0")
     public ResponseEntity<APIResponse<List<CompanyDTO>>> getAllCompanies() {
         Optional<List<CompanyDTO>> companyDTOS = companyService.findAllCompany();
@@ -47,6 +49,7 @@ public class CompanyController {
     }
 
     @GetMapping("/companies/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Cacheable(value = "companies", key = "#companyId")
     public ResponseEntity<CompanyDTO> getEmployeeById(@PathVariable(value = "id") Long companyId)
             throws ResourceNotFoundException {
@@ -59,6 +62,7 @@ public class CompanyController {
     }
 
     @PostMapping("/companies")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @CachePut(value = "company", key = "#companyDTO.id")
     public ResponseEntity<CompanyDTO> createCompany(@Valid @RequestBody CompanyDTO companyDTO) {
 
@@ -70,6 +74,7 @@ public class CompanyController {
     }
 
     @PutMapping("/companies/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @CachePut(value = "company", key = "#companyDTO.id")
     public ResponseEntity<CompanyDTO> updateCompany(@PathVariable(value = "id") Long companyId,
                                                     @Valid @RequestBody CompanyDTO companyDTO) throws ResourceNotFoundException {
@@ -81,6 +86,7 @@ public class CompanyController {
     }
 
     @DeleteMapping("/companies/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @CacheEvict(value = "companies", allEntries = true)
     public ResponseEntity<CompanyDTO> deleteCompany(@PathVariable(value = "id") Long companyId)
             throws ResourceNotFoundException {

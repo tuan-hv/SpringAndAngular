@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -29,12 +30,14 @@ public class EmployeeController {
 	private EmployeeService employeeService;
 
 	@GetMapping("/employees")
+	@PreAuthorize("permitAll()")
 	@Cacheable( value = "employees", unless= "#result.body.size() == 0")
 	public List<EmployeeDTO> getAllEmployees() {
 		return employeeService.findAllEmployee();
 	}
 
 	@GetMapping("/employees/{id}")
+	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 	@Cacheable(value = "companies", key = "#companyId")
 	public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable(value = "id") Long employeeId)
 			throws ResourceNotFoundException {
@@ -44,12 +47,14 @@ public class EmployeeController {
 	}
 
 	@PostMapping("/employees")
+	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 	@CachePut(value= "company", key= "#companyDTO.id")
 	public EmployeeDTO createEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
 		return employeeService.createEmployee(employeeDTO);
 	}
 
 	@PutMapping("/employees/{id}")
+	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 	@CachePut(value= "company", key= "#companyDTO.id")
 	public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable(value = "id") Long employeeId,
 			@Valid @RequestBody EmployeeDTO employeeDTO) throws ResourceNotFoundException {
@@ -59,6 +64,7 @@ public class EmployeeController {
 	}
 
 	@DeleteMapping("/employees/{id}")
+	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 	@CacheEvict(value = "companies", allEntries=true)
 	public ResponseEntity<EmployeeDTO> deleteEmployee(@PathVariable(value = "id") Long employeeId)
 			throws ResourceNotFoundException {
