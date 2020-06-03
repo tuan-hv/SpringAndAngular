@@ -37,7 +37,6 @@ public class CompanyController {
     private CompanyService companyService;
 
     @GetMapping("/companies")
-    @PreAuthorize("permitAll()")
     @Cacheable(value = "companies", unless = "#result.body.body.size() == 0")
     public ResponseEntity<APIResponse<List<CompanyDTO>>> getAllCompanies() {
         Optional<List<CompanyDTO>> companyDTOS = companyService.findAllCompany();

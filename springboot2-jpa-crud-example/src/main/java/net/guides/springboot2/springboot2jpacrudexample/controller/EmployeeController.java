@@ -30,7 +30,6 @@ public class EmployeeController {
 	private EmployeeService employeeService;
 
 	@GetMapping("/employees")
-	@PreAuthorize("permitAll()")
 	@Cacheable( value = "employees", unless= "#result.body.size() == 0")
 	public List<EmployeeDTO> getAllEmployees() {
 		return employeeService.findAllEmployee();
